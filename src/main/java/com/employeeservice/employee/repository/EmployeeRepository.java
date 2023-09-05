@@ -14,7 +14,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     Employee save(Employee employee);
 
-    //e.empId,e.firstName,e.lastName
     @Query("SELECT e FROM  Employee e, EmployeeProject ep WHERE e.empId != ep.empId")
     List<Employee> employeeWithNoProject();
 
