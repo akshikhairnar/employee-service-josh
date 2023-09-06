@@ -34,7 +34,7 @@ public class EmployeeDaprController {
         Employee employee = employeeService.addEmployee(employeeToAdd);
         EmployeeDTO employeeDTOAdded = EmployeeMapper.employeeDTOMapper(employee);
         //if (employeeDTOAdded !=null){
-            employeeDapr.notifyServices();
+            employeeDapr.notifyServices("New Employee Added");
         //}
         return new ResponseEntity<>(employeeDTOAdded, HttpStatus.OK);
     }

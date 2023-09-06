@@ -1,5 +1,7 @@
 package com.employeeservice.employee.scheduled;
 
+import com.employeeservice.employee.entity.Employee;
+import com.employeeservice.employee.externalservices.EmployeeDaprComponent;
 import com.employeeservice.employee.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,12 +11,15 @@ import org.springframework.integration.support.locks.LockRegistry;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 
 @Component
 public class EmployeeScheduled {
 
+    @Autowired
+    private EmployeeDaprComponent daprComponent;
     @Autowired
     private EmployeeRepository employeeRepository;
     private static final String MY_LOCK_KEY = "someLockKey";
@@ -44,9 +49,13 @@ public class EmployeeScheduled {
         try {
 
             log.info("Attempting to lock with thread: {}", uuid);
+            //assert lock != null;
             if (lock.tryLock()) {
                 log.info("jdbc lock successful with thread :{}", uuid);
-                log.info("Employee details without project: {}", employeeRepository.employeeWithNoProject());
+                List<Employee> employeeList=employeeRepository.employeeWithNoProject();
+                log.info("Employee details without project: {}",employeeList);
+                daprComponent.notifyServices(employeeList.toString());
+
                 Thread.sleep(5000);
                 locked = true;
             } else {
