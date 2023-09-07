@@ -1,5 +1,6 @@
-package com.employeeservice.employee.scheduled;
+package com.employeeservice.employee.scheduler;
 
+import com.employeeservice.employee.constant.DaprConfigurationConstants;
 import com.employeeservice.employee.entity.Employee;
 import com.employeeservice.employee.externalservices.EmployeeDaprComponent;
 import com.employeeservice.employee.repository.EmployeeRepository;
@@ -16,7 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 
 @Component
-public class EmployeeScheduled {
+public class EmployeeScheduler implements DaprConfigurationConstants {
 
     @Autowired
     private EmployeeDaprComponent daprComponent;
@@ -25,14 +26,14 @@ public class EmployeeScheduled {
     private static final String MY_LOCK_KEY = "someLockKey";
     private final LockRegistry lockRegistry;
 
-    public EmployeeScheduled(JdbcLockRegistry jdbcLockRegistry) {
+    public EmployeeScheduler(JdbcLockRegistry jdbcLockRegistry) {
         this.lockRegistry = jdbcLockRegistry;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(EmployeeScheduled.class);
+    private static final Logger log = LoggerFactory.getLogger(EmployeeScheduler.class);
 
 
-    @Scheduled(fixedRate = 7000)
+    @Scheduled(initialDelay = 5000,fixedRate = 20000)
     public void taskExecute() {
         log.info("TaskExecute Method Call");
         UUID uuid = UUID.randomUUID();
@@ -54,7 +55,7 @@ public class EmployeeScheduled {
                 log.info("jdbc lock successful with thread :{}", uuid);
                 List<Employee> employeeList=employeeRepository.employeeWithNoProject();
                 log.info("Employee details without project: {}",employeeList);
-                daprComponent.notifyServices(employeeList.toString());
+                daprComponent.notifyServices(PUB_SUB,SCHEDULER_NOTIFICATION_TOPIC,employeeList.toString());
 
                 Thread.sleep(5000);
                 locked = true;
