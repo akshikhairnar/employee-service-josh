@@ -39,11 +39,9 @@ public class EmployeeDaprComponent {
         return daprClient.invokeMethod(projectDaprId, projectMethodName + projectId, null, HttpExtension.GET, ProjectDTO.class);
     }
 
-    public void  notifyServices(){
-        log.info("Notification service get call");
-       // daprClient.invokeBinding("employeepubsub","test","New Employee Added");
-       //return
-        daprClient.publishEvent("employeepubsub","testdapr","New Employee Created").block();
+    public void  notifyServices(String pubsubName,String topicName,String msg){
+        log.info("Employee add notification service get call");
+        daprClient.publishEvent(pubsubName,topicName,msg).block();
     }
 
 

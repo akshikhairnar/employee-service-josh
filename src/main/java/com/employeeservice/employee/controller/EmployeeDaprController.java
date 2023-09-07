@@ -1,5 +1,6 @@
 package com.employeeservice.employee.controller;
 
+import com.employeeservice.employee.constant.DaprConfigurationConstants;
 import com.employeeservice.employee.dto.*;
 import com.employeeservice.employee.entity.Employee;
 import com.employeeservice.employee.entity.EmployeeProject;
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/employees")
-public class EmployeeDaprController {
+public class EmployeeDaprController implements DaprConfigurationConstants {
 
     @Autowired
     private EmployeeDaprComponent employeeDapr;
@@ -34,7 +35,7 @@ public class EmployeeDaprController {
         Employee employee = employeeService.addEmployee(employeeToAdd);
         EmployeeDTO employeeDTOAdded = EmployeeMapper.employeeDTOMapper(employee);
         //if (employeeDTOAdded !=null){
-            employeeDapr.notifyServices();
+            employeeDapr.notifyServices(PUB_SUB,EMPLOYEE_ADD_NOTIFICATION_TOPIC,"New Employee Added");
         //}
         return new ResponseEntity<>(employeeDTOAdded, HttpStatus.OK);
     }
